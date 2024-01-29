@@ -10,21 +10,34 @@ int[][] blocks ;
 void setup() {
   size(200, 200) ;
   balls = new Ball[]{
-    new Ball(new PVector(0, height / 2), new PVector(2.7 + random(-0.4, 0.4), 2 + random(-0.4, 0.4)), TEAM_BLUE, COL_BLUE),
-    new Ball(new PVector(width - BLOCK_WIDTH, height / 2), new PVector(-2 + random(-0.4, 0.4), -2.5 + random(-0.4, 0.4)), TEAM_GREEN, COL_GREEN) 
-    } ;
+    //add as many as you want here
+    new Ball(new PVector(0, height / 2), new PVector(2.5, 2.5), TEAM_BLUE, COL_BLUE),
+    //new Ball(new PVector(0, height / 2), new PVector(2.5, 2.5), TEAM_BLUE, COL_BLUE),
+    
+    //new Ball(new PVector(width - BLOCK_WIDTH, height / 2), new PVector(-2.5, -2.5), TEAM_GREEN, COL_GREEN),
+    new Ball(new PVector(width - BLOCK_WIDTH, height / 2), new PVector(-2.5, -2.5), TEAM_GREEN, COL_GREEN),
+  } ;
+  
+  for(Ball ball : balls) {
+    ball.speed.x = ball.speed.x + random(-0.4, 0.4) ;
+    ball.speed.y = ball.speed.y + random(-0.4, 0.4) ;
+  }  
+    
     
   blocks = new int[20][20] ;
   
   initBlocks() ;
+  //initBlocksCheckered() ;
  }
 
 
-void draw() {  
+void draw() {
+  background(0) ;
   drawBlocks() ;
 
   for(Ball ball : balls) { 
-    ball.draw().move() ;
+    ball.draw() ;
+    ball.move() ;
   
     //bounce off walls
     if((ball.position.x <= 0) || (ball.position.x + BLOCK_WIDTH >= width)) {
@@ -52,7 +65,10 @@ void draw() {
       
       if(diffX > diffY) {
         ball.bounceX() ;
+      } else if(diffX < diffY) {
+        ball.bounceY() ;
       } else {
+        ball.bounceX() ;
         ball.bounceY() ;
       }
       
@@ -71,6 +87,17 @@ void draw() {
 int[] blockIdx(PVector position) {
   int[] idx = new int[] { int(position.x / BLOCK_WIDTH ), int(position.y / BLOCK_WIDTH)} ;
   return idx ;
+}
+void initBlocksCheckered() {
+  for(int row = 0 ; row < blocks.length ; row++) {
+    for(int col = 0 ; col < blocks[0].length ; col++) {
+      if((col + row) % 2 == 0) {
+        blocks[row][col] = TEAM_GREEN ;  
+      } else {
+        blocks[row][col] = TEAM_BLUE ;  
+      }
+    }  
+  }
 }
 
 void initBlocks() {
