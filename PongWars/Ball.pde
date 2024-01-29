@@ -2,24 +2,16 @@ class Ball {
   int team ;
   PVector position ;
   PVector speed ;
-  PVector prevPosition ;
   color col ;
   
-  Ball(int team, PVector position, PVector speed) {
+  Ball(PVector position, PVector speed, int team, color col) {
     this.team = team ;
     this.position = position ;
     this.speed = speed ;
-    prevPosition = new PVector(0, 0) ;
-    if(team == TEAM_BLUE) {
-      col = color(63, 63, 255) ;
-    }
-    if(team == TEAM_GREEN) {
-      col = color(63, 255, 63) ;
-    }
+    this.col = col ;
 }
   
   Ball move() {
-    prevPosition = this.position ;
     this.position.add(speed) ;
     return this ;
   }

@@ -10,8 +10,8 @@ int[][] blocks ;
 void setup() {
   size(200, 200) ;
   balls = new Ball[]{
-    new Ball(TEAM_BLUE, new PVector(0, height / 2), new PVector(2.7 + random(-0.1, 0.1), 2)),
-    new Ball(TEAM_GREEN, new PVector(width - 10, height / 2), new PVector(-2 + random(-0.1, 0.1), -2.5)) 
+    new Ball(new PVector(0, height / 2), new PVector(2.7 + random(-0.4, 0.4), 2 + random(-0.4, 0.4)), TEAM_BLUE, COL_BLUE),
+    new Ball(new PVector(width - BLOCK_WIDTH, height / 2), new PVector(-2 + random(-0.4, 0.4), -2.5 + random(-0.4, 0.4)), TEAM_GREEN, COL_GREEN) 
     } ;
     
   blocks = new int[20][20] ;
@@ -20,15 +20,13 @@ void setup() {
  }
 
 
-
-void draw() {
-  //background(127, 127, 127) ;
-  
+void draw() {  
   drawBlocks() ;
 
   for(Ball ball : balls) { 
     ball.draw().move() ;
-
+  
+    //bounce off walls
     if((ball.position.x <= 0) || (ball.position.x + BLOCK_WIDTH >= width)) {
       ball.bounceX() ;
     }
@@ -37,14 +35,26 @@ void draw() {
       ball.bounceY() ;
     }
     
-    int pos[] = blockIdx(ball.position) ;
-    int col = pos[0] ;
-    int row = pos[1] ;
+    //crush blocks
+    PVector ballCenter = PVector.add(ball.position, new PVector(BLOCK_WIDTH / 2, BLOCK_WIDTH / 2)) ;
+    int idxBallCenter[] = blockIdx(ballCenter) ;
+    int col = idxBallCenter[0] ;
+    int row = idxBallCenter[1] ;
  
     int val = blocks[row][col] ;
 
+    
     if(val == ball.team) {
-      ball.bounceX() ;
+      //determine the direction of bounce by the vector from ball center to block center
+      PVector blockCenter = new PVector(col * BLOCK_WIDTH + (BLOCK_WIDTH / 2), row * BLOCK_WIDTH  + (BLOCK_WIDTH / 2)) ;
+      float diffX = abs(ballCenter.x - blockCenter.x) ;
+      float diffY = abs(ballCenter.y - blockCenter.y) ;
+      
+      if(diffX > diffY) {
+        ball.bounceX() ;
+      } else {
+        ball.bounceY() ;
+      }
       
       if(ball.team == TEAM_BLUE) {
         blocks[row][col] = TEAM_GREEN ;
@@ -57,6 +67,7 @@ void draw() {
 
 }
 
+//which block the ball is over
 int[] blockIdx(PVector position) {
   int[] idx = new int[] { int(position.x / BLOCK_WIDTH ), int(position.y / BLOCK_WIDTH)} ;
   return idx ;
@@ -72,7 +83,6 @@ void initBlocks() {
       }
     }  
   }
-  //remainingBlocks = blocks.length * blocks[0].length ;
 }
 
 void drawBlocks() {
